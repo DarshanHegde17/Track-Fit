@@ -32,13 +32,9 @@ calories_collection = db["daily_calories"]
 nutrition_collection = db["nutrition_items"]
 plans_collection = db["nutrition_plans"]
 tips_collection = db["nutrition_tips"]
+saved_exercises_collection = db["saved_exercises"] # New collection for saved exercises
 users_collection = db["users"]
 chat_history_collection = db["chat_history"]
-
-
-today = str(date.today())
-meal = meals_collection.find_one({"date": today})
-
 
 # -----------------------------
 # INDEX PAGE
@@ -177,12 +173,13 @@ def today_meal():
         return redirect("/login")
     today = str(date.today())
     user = session["user"]
-    meal = meals_collection.find_one({"date": today})
+    meal = meals_collection.find_one({"date": today, "user": user})
 
     # If no meal exists yet, create empty template
     if not meal:
         meal = {
             "date": today,
+            "user": user,
             "breakfast": {"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0},
             "lunch": {"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0},
             "dinner": {"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0}
@@ -792,11 +789,11 @@ def daily_calories():
 
     # --- Automatic calculation from meals ---
     consumed_auto = 0
-    meal_doc = meals_collection.find_one({"date": today})
+    meal_doc = meals_collection.find_one({"date": today, "user": user})
     if meal_doc:
-        for meal in ["breakfast", "lunch", "dinner"]:
-            if meal in meal_doc and meal_doc[meal].get("calories"):
-                consumed_auto += int(meal_doc[meal]["calories"])
+        for meal_type in ["breakfast", "lunch", "dinner"]:
+            if meal_type in meal_doc and meal_doc[meal_type].get("calories"):
+                consumed_auto += int(meal_doc[meal_type]["calories"])
 
     # --- Automatic burned calories from workouts and steps ---
     burned_auto = 0
@@ -847,10 +844,10 @@ def monthly_progress():
 
         # ---------------- Consumed Calories ----------------
         consumed = 0
-        meal = meals_collection.find_one({"date": d})
-        if meal:
+        meal_data = meals_collection.find_one({"date": d, "user": user})
+        if meal_data:
             for m in ["breakfast", "lunch", "dinner"]:
-                consumed += meal.get(m, {}).get("calories", 0)
+                consumed += meal_data.get(m, {}).get("calories", 0)
 
         daily_cal = calories_collection.find_one({"date": d, "user": user})
         if daily_cal:
@@ -955,15 +952,74 @@ def about():
     return render_template("about.html")
 
 
-
 @app.route("/exercise", methods=["GET", "POST"])
 def exercise():
+    if "user" not in session:
+        return redirect("/login")
+        
+    user = session["user"]
+    today_str = str(date.today()) # This variable is not used in this route after fetching stats, consider removing if not needed elsewhere.
+
+    # Fetch Stats for Sidebar
+    daily = calories_collection.find_one({"date": today_str, "user": user}) or {"goal": 2000, "consumed": 0, "burned": 0}
+    water = water_collection.find_one({"date": today_str, "user": user}) or {"goal": 8, "current": 0}
+    
+    # Fetch saved exercises for the current user
+    saved_exercises = list(saved_exercises_collection.find({"user": user}, {"_id": 0, "activity_name": 1}))
+
+    # Calculate Remaining
+    goal = daily.get("goal", 2000)
+    consumed = daily.get("consumed", 0)
+    burned = daily.get("burned", 0)
+    remaining = max(0, goal - consumed + burned)
+    
+    stats = {
+        "goal": goal, "consumed": consumed, "burned": burned, "remaining": remaining,
+        "water_current": water.get("current", 0), "water_goal": water.get("goal", 8)
+    }
+
     if request.method == "POST":
         activity = request.form.get("activity", "").strip()
         if activity:
             query = activity.replace(" ", "+")
             return redirect(f"https://www.google.com/search?q={query}+calories+burned")
-    return render_template("exercise.html")
+    return render_template("exercise.html", stats=stats, saved_exercises=saved_exercises)
+
+@app.route("/exercise/save", methods=["POST"])
+def save_exercise():
+    if "user" not in session:
+        return jsonify({"success": False, "message": "Not authenticated"}), 401
+    
+    user = session["user"]
+    activity_name = request.json.get("activity_name", "").strip()
+
+    if not activity_name:
+        return jsonify({"success": False, "message": "Activity name cannot be empty"}), 400
+
+    # Check for duplicate
+    if saved_exercises_collection.find_one({"user": user, "activity_name": activity_name}):
+        return jsonify({"success": False, "message": "Activity already saved"}), 409
+
+    saved_exercises_collection.insert_one({"user": user, "activity_name": activity_name})
+    return jsonify({"success": True, "message": "Activity saved successfully"}), 201
+
+@app.route("/exercise/delete", methods=["POST"])
+def delete_exercise():
+    if "user" not in session:
+        return jsonify({"success": False, "message": "Not authenticated"}), 401
+    
+    user = session["user"]
+    activity_name = request.json.get("activity_name", "").strip()
+
+    if not activity_name:
+        return jsonify({"success": False, "message": "Activity name cannot be empty"}), 400
+
+    result = saved_exercises_collection.delete_one({"user": user, "activity_name": activity_name})
+
+    if result.deleted_count > 0:
+        return jsonify({"success": True, "message": "Activity deleted successfully"}), 200
+    else:
+        return jsonify({"success": False, "message": "Activity not found"}), 404
 
 # -----------------------------
 # RUN APP
