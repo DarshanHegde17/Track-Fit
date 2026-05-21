@@ -19,7 +19,7 @@ The application helps users track:
 ## Add Project Screenshot Here
 
 ![Track Fit Banner](static/images/1.png)
-> Replace `project-preview.png` with your project image.
+
 
 ---
 
@@ -176,20 +176,25 @@ http://127.0.0.1:5000
 ## Homepage
 
 ```md
-![Homepage](images/home.png)
+![Homepage](static\images\2.png)
 ```
+
 
 ## Dashboard
 
 ```md
-![Dashboard](images/dashboard.png)
+![Dashboard](static\images\3.png)
 ```
 
-## Workout Page
+## calories Page
 
 ```md
-![Workout](images/workout.png)
+![Workout](static\images\6.png)
 ```
+## nutrition  Page
+![Workout](static\images\7.png)
+```
+
 
 ---
 
