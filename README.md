@@ -176,23 +176,23 @@ http://127.0.0.1:5000
 ## Homepage
 
 ```md
-![Homepage](static\images\2.png)
+![Homepage](static/images/2.png)
 ```
 
 
 ## Dashboard
 
 ```md
-![Dashboard](static\images\3.png)
+![Dashboard](static/images/3.png)
 ```
 
 ## calories Page
 
 ```md
-![Workout](static\images\6.png)
+![Workout](static/images/6.png)
 ```
 ## nutrition  Page
-![Workout](static\images\7.png)
+![Workout](static/images/7.png)
 ```
 
 
