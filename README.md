@@ -18,8 +18,7 @@ The application helps users track:
 
 ## Add Project Screenshot Here
 
-![Track Fit Banner]("images\1.png)
-
+![Track Fit Banner](static/images/1.png)
 > Replace `project-preview.png` with your project image.
 
 ---
