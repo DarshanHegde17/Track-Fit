@@ -175,24 +175,25 @@ http://127.0.0.1:5000
 
 ## Homepage
 
-
 ![Homepage](static/images/2.png)
-```
 
+---
 
 ## Dashboard
 
-
 ![Dashboard](static/images/3.png)
-```
 
-## calories Page
+---
 
-![Workout](static/images/6.png)
-```
-## nutrition  Page
-![Workout](static/images/7.png)
-```
+## Calories Page
+
+![Calories](static/images/6.png)
+
+---
+
+## Nutrition Page
+
+![Nutrition](static/images/7.png)
 
 
 ---
