@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daily Calories – FitnessApp</title>
+<!-- Bootstrap & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #ffffff;
+  --secondary: #888888;
+  --bg-dark: #000000;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.navbar-brand { color: var(--primary) !important; }
+
+.btn-back {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ===== DASHBOARD STATS ===== */
+.stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  min-width: 180px;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover { transform: translateY(-5px); }
+.stat-card h6 { color: var(--secondary); margin-bottom: 8px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+.stat-card .value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+
+/* ===== ACTION CARD ===== */
+.action-card {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  padding: 40px;
+  border: 1px solid var(--glass-border);
+  max-width: 600px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.action-card h5 {
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #fff;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+/* ===== FORM STYLING ===== */
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  color: #fff;
+  padding: 12px 20px;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  box-shadow: none;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.input-group-text {
+  border-radius: 15px 0 0 15px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--glass-border) !important;
+}
+
+.input-group > .form-control { border-radius: 0 !important; border-left: none; border-right: none; }
+
+.btn-action {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: white !important;
+  border-radius: 0 15px 15px 0 !important;
+  padding: 0 20px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.btn-primary-custom {
+  background: var(--accent);
+  border: none;
+  border-radius: 0 15px 15px 0 !important;
+  transition: transform 0.2s ease;
+}
+
+.btn-primary-custom:hover {
+  transform: scale(1.02);
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">💪 TrackFit</a>
+    <div class="ms-auto">
+      <a href="/dashboard" class="btn-back"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">🔥 Daily Calorie Tracker</h2>
+    <p class="opacity-75">Monitor your energy balance for <strong>{{ data.date }}</strong></p>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <h6 style="color: #0ea5e9;">Goal</h6>
+      <div class="value text-info" style="border-left-color: #0ea5e9;">{{ data.goal }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #ef4444;">
+      <h6>Consumed</h6>
+      <div class="value text-danger">{{ data.consumed }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #22c55e;">
+      <h6>Burned</h6>
+      <div class="value text-success">{{ data.burned }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #facc15;">
+      <h6>Remaining</h6>
+      <div class="value text-warning">{{ remaining }}</div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <h5>Update Daily Stats</h5>
+    
+    <!-- SET GOAL -->
+    <form method="POST" class="mb-4">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent border-end-0 text-white">
+          <i class="bi bi-target"></i>
+        </span>
+        <input type="number" name="goal" class="form-control border-start-0" placeholder="Set Daily Goal" required>
+        <button type="submit" name="set_goal" class="btn-action btn-primary-custom">Set Goal</button>
+      </div>
+    </form>
+
+    <!-- ADD FOOD -->
+    <form method="POST" class="mb-4">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent border-end-0 text-white">
+          <i class="bi bi-egg-fried"></i>
+        </span>
+        <input type="number" name="food_cal" class="form-control border-start-0" placeholder="Manual Food Calories" required>
+        <button type="submit" name="add_food" class="btn-action" style="border-color: #ef4444; color: #fff;">+ Food</button>
+      </div>
+    </form>
+
+    <!-- ADD EXERCISE -->
+    <form method="POST">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent border-end-0 text-white">
+          <i class="bi bi-fire"></i>
+        </span>
+        <input type="number" name="burn_cal" class="form-control border-start-0" placeholder="Manual Burn Calories" required>
+        <button type="submit" name="add_exercise" class="btn-action" style="border-color: #22c55e; color: #fff;">+ Burn</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <small class="text-muted">Total calories include automatic logs from meals, steps, and workouts.</small>
+    </div>
+  </div>
+</div>
+
+<footer class="text-center py-4 opacity-50">
+  © 2025 TrackFit • Monochromatic Excellence
+</footer>
+
+</body>
+</html>

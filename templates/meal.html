@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Today's Meals – FitnessApp</title>
+
+<!-- Bootstrap & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #ffffff;
+  --secondary: #888888;
+  --bg-dark: #000000;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.navbar-brand { color: var(--primary) !important; }
+
+.btn-back {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ===== DASHBOARD STATS ===== */
+.stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  min-width: 160px;
+  border-radius: 15px;
+  text-align: center;
+  border: 1px solid var(--glass-border);
+}
+
+.stat-card h6 { color: var(--secondary); margin-bottom: 5px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+.stat-card .value { font-size: 1.2rem; font-weight: 700; color: #fff; }
+
+/* ===== MEAL CARDS ===== */
+.meal-card {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 25px;
+  height: 100%;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.meal-title {
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* ===== FORM STYLING ===== */
+.form-label { font-weight: 600; font-size: 0.8rem; color: var(--secondary); }
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: #fff;
+  padding: 10px;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  box-shadow: none;
+}
+
+.form-control::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.btn-save {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 30px;
+  font-weight: 700;
+  width: 100%;
+  margin-top: 20px;
+  transition: transform 0.2s ease;
+}
+
+.btn-save:hover {
+  transform: scale(1.02);
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">💪 TrackFit</a>
+    <div class="ms-auto">
+      <a href="/dashboard" class="btn-back"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">📅 Daily Meal Planner</h2>
+    <p class="opacity-75">Tracking for: <strong>{{ today }}</strong></p>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <h6>Goal</h6>
+      <div class="value">{{ stats.goal }} kcal</div>
+    </div>
+    <div class="stat-card" style="border-color: #ef4444;">
+      <h6>Consumed</h6>
+      <div class="value text-danger">{{ stats.consumed }} kcal</div>
+    </div>
+    <div class="stat-card" style="border-color: #22c55e;">
+      <h6>Left</h6>
+      <div class="value text-success">{{ stats.remaining }} kcal</div>
+    </div>
+    <div class="stat-card" style="border-color: #0ea5e9;">
+      <h6>Glasses</h6>
+      <div class="value text-info">{{ stats.water_current }} / {{ stats.water_goal }}</div>
+    </div>
+  </div>
+
+  <form action="/meal/save" method="POST">
+    <div class="row g-4">
+      <!-- BREAKFAST -->
+      <div class="col-md-4">
+        <div class="meal-card">
+          <h4 class="meal-title">🍳 Breakfast</h4>
+          <div class="mb-4">
+            <label class="form-label">Meal Name</label>
+            <input type="text" name="b_name" class="form-control" value="{{ meal.breakfast.name }}" placeholder="e.g. Eggs & Toast">
+          </div>
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label">Calories</label><input type="number" name="b_cal" class="form-control" value="{{ meal.breakfast.calories }}"></div>
+            <div class="col-6"><label class="form-label">Protein (g)</label><input type="number" name="b_pro" class="form-control" value="{{ meal.breakfast.protein }}"></div>
+            <div class="col-6"><label class="form-label">Carbs (g)</label><input type="number" name="b_carbs" class="form-control" value="{{ meal.breakfast.carbs }}"></div>
+            <div class="col-6"><label class="form-label">Fats (g)</label><input type="number" name="b_fats" class="form-control" value="{{ meal.breakfast.fats }}"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LUNCH -->
+      <div class="col-md-4">
+        <div class="meal-card">
+          <h4 class="meal-title">🥗 Lunch</h4>
+          <div class="mb-4">
+            <label class="form-label">Meal Name</label>
+            <input type="text" name="l_name" class="form-control" value="{{ meal.lunch.name }}" placeholder="e.g. Chicken Salad">
+          </div>
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label">Calories</label><input type="number" name="l_cal" class="form-control" value="{{ meal.lunch.calories }}"></div>
+            <div class="col-6"><label class="form-label">Protein (g)</label><input type="number" name="l_pro" class="form-control" value="{{ meal.lunch.protein }}"></div>
+            <div class="col-6"><label class="form-label">Carbs (g)</label><input type="number" name="l_carbs" class="form-control" value="{{ meal.lunch.carbs }}"></div>
+            <div class="col-6"><label class="form-label">Fats (g)</label><input type="number" name="l_fats" class="form-control" value="{{ meal.lunch.fats }}"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DINNER -->
+      <div class="col-md-4">
+        <div class="meal-card">
+          <h4 class="meal-title">🍗 Dinner</h4>
+          <div class="mb-4">
+            <label class="form-label">Meal Name</label>
+            <input type="text" name="d_name" class="form-control" value="{{ meal.dinner.name }}" placeholder="e.g. Grilled Salmon">
+          </div>
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label">Calories</label><input type="number" name="d_cal" class="form-control" value="{{ meal.dinner.calories }}"></div>
+            <div class="col-6"><label class="form-label">Protein (g)</label><input type="number" name="d_pro" class="form-control" value="{{ meal.dinner.protein }}"></div>
+            <div class="col-6"><label class="form-label">Carbs (g)</label><input type="number" name="d_carbs" class="form-control" value="{{ meal.dinner.carbs }}"></div>
+            <div class="col-6"><label class="form-label">Fats (g)</label><input type="number" name="d_fats" class="form-control" value="{{ meal.dinner.fats }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-width-md mx-auto text-center mt-4">
+      <button type="submit" class="btn btn-save">💾 Save Today's Meals</button>
+    </div>
+  </form>
+</div>
+
+<footer class="text-center py-4 opacity-50">
+  © 2025 TrackFit • Monochromatic Excellence
+</footer>
+
+</body>
+</html>

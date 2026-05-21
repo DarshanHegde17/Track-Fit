@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monthly Progress – FitnessApp</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #ffffff;
+  --secondary: #888888;
+  --bg-dark: #000000;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  background: rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.navbar-brand { color: var(--primary) !important; }
+
+.btn-back {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ================= PAGE TITLE ================= */
+.page-title {
+  text-align: center;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 40px;
+}
+
+/* ================= GLASS CARD ================= */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 25px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.glass-card h5 {
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+/* ================= TABLE ================= */
+.table {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.table thead th {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  position: sticky;
+  top: 0;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ================= FOOTER ================= */
+footer {
+  background: rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(10px);
+  margin-top: 40px;
+  color: var(--secondary) !important;
+  border-top: 1px solid var(--glass-border);
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">💪 TrackFit</a>
+    <div class="ms-auto">
+      <a href="/dashboard" class="btn-back"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="container py-5">
+
+  <h2 class="page-title">📅 Monthly Progress</h2>
+
+  <!-- DAILY SUMMARY -->
+  <div class="glass-card">
+    <h5>📋 Daily Summary</h5>
+    <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+      <table class="table table-bordered text-center mb-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Consumed 🔴</th>
+            <th>Burned 🟢</th>
+            <th>Water 💧</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(labels|length) %}
+          <tr>
+            <td>{{ labels[i] }}</td>
+            <td>{{ consumed[i] }}</td>
+            <td>{{ burned[i] }}</td>
+            <td>{{ water[i] }} glasses</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONSUMED -->
+  <div class="glass-card">
+    <h5>🔥 Consumed Calories</h5>
+    <canvas id="consumedChart"></canvas>
+  </div>
+
+  <!-- BURNED -->
+  <div class="glass-card">
+    <h5>🏃 Burned Calories</h5>
+    <canvas id="burnedChart"></canvas>
+  </div>
+
+  <!-- WATER -->
+  <div class="glass-card">
+    <h5>💧 Water Intake</h5>
+    <canvas id="waterChart"></canvas>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="text-center py-4 opacity-50">
+  © 2025 FitnessApp • Track Progress • Stay Consistent 💪
+</footer>
+
+<!-- ================= CHART LOGIC (UNCHANGED, LIGHT THEME) ================= -->
+<script>
+const labels = {{ labels | safe }};
+const consumedData = {{ consumed | safe }};
+const burnedData = {{ burned | safe }};
+const waterData = {{ water | safe }};
+
+function createLineChart(id, data, label, color) {
+    new Chart(document.getElementById(id), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                borderColor: color,
+                backgroundColor: color,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: false,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: "#fff" } }
+            },
+            scales: {
+                x: {
+                  ticks: { color: "#fff" },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" }
+                },
+                y: {
+                  ticks: { color: "#fff" },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" }
+                }
+            }
+        }
+    });
+}
+
+createLineChart("consumedChart", consumedData, "Consumed Calories", "#ef4444");
+createLineChart("burnedChart", burnedData, "Burned Calories", "#22c55e");
+createLineChart("waterChart", waterData, "Water Intake", "#2563eb");
+</script>
+
+</body>
+</html>
