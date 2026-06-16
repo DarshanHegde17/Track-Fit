@@ -2,7 +2,6 @@
 Track Fit is a modern Fitness & Calorie Tracking Web Application built using Flask, MongoDB, HTML, CSS, and JavaScript.
 
 The application helps users track:
-
 - Daily Meals
 - Calories
 - Water Intake
