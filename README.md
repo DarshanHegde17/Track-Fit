@@ -10,6 +10,7 @@ The application helps users track:
 - Monthly Progress
 - Nutrition Information
 
+
 # 📸 Project Preview
 
 ## Add Project Screenshot Here
