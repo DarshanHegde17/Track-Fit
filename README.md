@@ -12,8 +12,6 @@ The application helps users track:
 
 
 
----
-
 # 📸 Project Preview
 
 ## Add Project Screenshot Here
