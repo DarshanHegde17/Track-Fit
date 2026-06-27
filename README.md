@@ -17,6 +17,7 @@ The application helps users track:
 ![Track Fit Banner](static/images/1.png)
 
 
+
 ---
 
 # 🚀 Features
