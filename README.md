@@ -15,9 +15,6 @@ The application helps users track:
 ## Add Project Screenshot Here
 
 ![Track Fit Banner](static/images/1.png)
-
-
-
 ---
 
 # 🚀 Features
