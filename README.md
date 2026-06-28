@@ -68,7 +68,6 @@ The application helps users track:
 - Water Progress
 
 ---
-
 # 🛠️ Technologies Used
 
 ## Frontend
