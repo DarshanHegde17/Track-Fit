@@ -48,7 +48,6 @@ The application helps users track:
 
 ---
 
-
 ## 💧 Water Tracker
 - Daily Water Goal
 - Water Intake Progress
