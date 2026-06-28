@@ -54,7 +54,6 @@ The application helps users track:
 - Add/Remove Water Glasses
 
 ---
-
 ## 🏋️ Workout Management
 - Daily Workout Plans
 - Exercise Calories
